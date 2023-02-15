@@ -1,4 +1,8 @@
-var card = document.getElementById('cards')
+const card = document.getElementById('cards')
+const form = document.getElementById('formContato');
+
+
+
 
 
 
@@ -12,6 +16,7 @@ async function loadData () {
     console.log(error)
     return
   } else {
+    card.innerHTML='';
     Contatos.map(contato => {
       card.innerHTML += `
         <div class="card m-4" style="width: 18rem;">
@@ -26,4 +31,38 @@ async function loadData () {
   }
 }
 
-loadData()
+loadData();
+
+
+form.addEventListener('submit', async (e) => {
+
+    e.preventDefault();
+
+    let nome = form.nome.value;
+    let telefone = form.telefone.value;
+
+    let data = {
+        Nome: nome, 
+        Telefone: telefone
+    }
+
+    console.log(data);
+ insertData(data);
+ form.reset() ; 
+ 
+}); 
+
+
+async function insertData(dado){
+
+const {data,erro} = await _supabase.from('Contatos').insert([dado]);
+
+if(erro){
+    console.log(erro);
+    return;
+}else{
+console.log("dado salvo com sucesso!");
+loadData();
+}
+}
+
