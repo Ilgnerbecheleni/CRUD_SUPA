@@ -1,10 +1,6 @@
 const card = document.getElementById('cards')
 const form = document.getElementById('formContato');
-let condicao = true ;
-
-
-
-
+let condicao = true;
 
 
 async function loadData () {
@@ -27,7 +23,7 @@ async function loadData () {
             <h5 class="card-title">${contato.Nome}</h5>
             <h5 class="card-text">${contato.Telefone}</h5>
             <button class="btn btn-primary" onClick='prepareData(${contato.id})'>Editar</button>
-            <button class="btn btn-danger">Apagar</button>
+            <button class="btn btn-danger" onClick='deletar(${contato.id})'>Apagar</button>
         </div>
     </div>`
     })
@@ -53,10 +49,15 @@ form.addEventListener('submit', async (e) => {
     if(condicao){
         insertData(data);
     }else{
-        let id = parseInt(form.hiddenId.value);
+
+        let id = parseInt(form.inputid.value);
         updateData(id,data);
-        condicao=true;
+        
+
+
     }
+   
+    
 
  form.reset() ; 
  
@@ -76,45 +77,61 @@ loadData();
 }
 }
 
+
+async function deletar(id){
+
+    if(confirm("Deseja realmente apagar esse dado?")){
+        const { data, error } = await _supabase
+        .from('Contatos')
+        .delete()
+        .eq('id', id);
+    if(error){
+        console.log(error);
+        return
+    }
+    loadData();
+    }
+
+    return
+
+}
+
+
 async function prepareData(id){
 
     let { data: Contatos, error } = await _supabase
-    .from('Contatos')
-    .select().eq('id', id).limit(1)
-    if(error){
-        console.log(error);
-        return;
-    }else{
-       
-        console.log(Contatos[0]["Nome"]);
-        form.hiddenId.value = Contatos[0]["id"]
-          form.nome.value = Contatos[0]["Nome"] ;
-          form.telefone.value = Contatos[0]["Telefone"] ;
-          condicao = false ;
-    }
-    
+  .from('Contatos')
+  .select('*').eq('id', id)
+  
+
+  if (error) {
+    console.log(error)
+    return
+  } else {
+
+form.inputid.value = Contatos[0]["id"];
+form.nome.value = Contatos[0]["Nome"];
+form.telefone.value = Contatos[0]["Telefone"];
+condicao = false ;
+
+  }
+
+
+
 }
-
-
 
 async function updateData(id,dado){
 
- 
     const { data, error } = await _supabase
     .from('Contatos')
     .update(dado)
-    .eq('id', id)
+    .eq('id',id);
 
-   
-if(error){
-    console.log(error);
-    
-    return 
-}
-loadData();
-
+    if(error){
+        console.log(error);
+        return
+    }
+    condicao=true;
+    loadData();
 
 }
-
-updateData(1);
-
