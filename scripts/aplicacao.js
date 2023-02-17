@@ -1,12 +1,21 @@
 const card = document.getElementById('cards')
 const form = document.getElementById('formContato');
+const spinner = document.getElementById('spinner');
 let condicao = true;
 
+
+function showSpinner(){
+    spinner.classList.remove("visually-hidden");
+}
+
+function hideSpinner(){
+    spinner.classList.add("visually-hidden");
+}
 
 async function loadData () {
 
 
-
+showSpinner();
   let { data: Contatos, error } = await _supabase.from('Contatos').select('*')
 
   console.table(Contatos)
@@ -27,6 +36,7 @@ async function loadData () {
         </div>
     </div>`
     })
+    hideSpinner();
   }
 }
 
@@ -65,7 +75,7 @@ form.addEventListener('submit', async (e) => {
 
 
 async function insertData(dado){
-
+    showSpinner();
 const {data,erro} = await _supabase.from('Contatos').insert([dado]);
 
 if(erro){
@@ -73,7 +83,9 @@ if(erro){
     return;
 }else{
 console.log("dado salvo com sucesso!");
+hideSpinner()
 loadData();
+
 }
 }
 
@@ -81,14 +93,17 @@ loadData();
 async function deletar(id){
 
     if(confirm("Deseja realmente apagar esse dado?")){
+        showSpinner();
         const { data, error } = await _supabase
         .from('Contatos')
         .delete()
         .eq('id', id);
     if(error){
+      
         console.log(error);
         return
     }
+    hideSpinner()
     loadData();
     }
 
@@ -121,7 +136,7 @@ condicao = false ;
 }
 
 async function updateData(id,dado){
-
+    showSpinner();
     const { data, error } = await _supabase
     .from('Contatos')
     .update(dado)
@@ -131,6 +146,7 @@ async function updateData(id,dado){
         console.log(error);
         return
     }
+    hideSpinner();
     condicao=true;
     loadData();
 
